@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0d14;
+  --paper:#f7f5f0;
+  --cream:#edeae2;
+  --accent:#e85d2f;
+  --accent2:#3d5af1;
+  --gold:#f5b800;
+  --muted:#8b8880;
+  --card:#ffffff;
+}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  position:relative;
+}
+/* Background decoration */
+.bg-deco{position:fixed;inset:0;pointer-events:none;overflow:hidden;}
+.bg-deco .ring{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(13,13,20,0.07);
+}
+.ring1{width:600px;height:600px;top:-200px;left:-200px;}
+.ring2{width:900px;height:900px;top:-350px;left:-350px;}
+.ring3{width:400px;height:400px;bottom:-150px;right:-100px;border-color:rgba(232,93,47,0.12);}
+.ring4{width:600px;height:600px;bottom:-250px;right:-200px;border-color:rgba(232,93,47,0.08);}
+.dot-grid{
+  position:absolute;
+  inset:0;
+  background-image:radial-gradient(circle,rgba(13,13,20,0.06) 1px,transparent 1px);
+  background-size:28px 28px;
+}
+.accent-blob{
+  position:absolute;
+  top:15%;right:8%;
+  width:220px;height:220px;
+  background:radial-gradient(circle,rgba(232,93,47,0.12),transparent 70%);
+  border-radius:50%;
+}
+.accent-blob2{
+  position:absolute;
+  bottom:10%;left:5%;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(61,90,241,0.08),transparent 70%);
+  border-radius:50%;
+}
+
+/* Main card */
+.card{
+  background:var(--card);
+  border-radius:24px;
+  padding:52px 48px;
+  width:100%;max-width:440px;
+  position:relative;
+  z-index:10;
+  box-shadow:0 1px 0 rgba(255,255,255,0.8) inset,
+             0 24px 60px rgba(13,13,20,0.1),
+             0 4px 16px rgba(13,13,20,0.06);
+}
+.logo{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:36px;
+}
+.logo-icon{
+  width:44px;height:44px;
+  background:var(--ink);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.logo-text{
+  font-family:'Syne',sans-serif;
+  font-weight:800;font-size:22px;
+  letter-spacing:-0.5px;
+}
+.logo-text span{color:var(--accent);}
+
+h1{
+  font-family:'Syne',sans-serif;
+  font-weight:700;font-size:28px;
+  letter-spacing:-0.5px;
+  margin-bottom:8px;
+  line-height:1.2;
+}
+.subtitle{
+  color:var(--muted);
+  font-size:15px;font-weight:300;
+  margin-bottom:32px;
+}
+
+.tab-row{
+  display:flex;
+  background:var(--cream);
+  border-radius:10px;
+  padding:4px;
+  margin-bottom:28px;
+}
+.tab-btn{
+  flex:1;padding:9px;
+  border:none;background:transparent;
+  font-family:'DM Sans',sans-serif;
+  font-size:14px;font-weight:500;
+  color:var(--muted);
+  border-radius:7px;
+  cursor:pointer;transition:all 0.2s;
+}
+.tab-btn.active{
+  background:white;color:var(--ink);
+  box-shadow:0 1px 4px rgba(0,0,0,0.1);
+}
+
+.field{margin-bottom:18px;}
+.field label{
+  display:block;font-size:13px;font-weight:500;
+  color:var(--muted);margin-bottom:6px;
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+.field input{
+  width:100%;padding:13px 16px;
+  border:1.5px solid var(--cream);
+  border-radius:10px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;color:var(--ink);
+  background:var(--paper);
+  transition:border-color 0.2s,box-shadow 0.2s;
+  outline:none;
+}
+.field input:focus{
+  border-color:var(--accent2);
+  box-shadow:0 0 0 3px rgba(61,90,241,0.1);
+  background:white;
+}
+
+.submit-btn{
+  width:100%;padding:15px;
+  background:var(--ink);
+  color:white;border:none;
+  border-radius:10px;
+  font-family:'Syne',sans-serif;
+  font-size:16px;font-weight:600;
+  cursor:pointer;
+  margin-top:8px;
+  transition:all 0.2s;
+  position:relative;overflow:hidden;
+}
+.submit-btn::after{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,0.08));
+}
+.submit-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 24px rgba(13,13,20,0.25);
+}
+.submit-btn:active{transform:translateY(0);}
+
+.divider{
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  margin:20px 0;
+  position:relative;
+}
+.divider::before,.divider::after{
+  content:'';
+  position:absolute;top:50%;
+  width:40%;height:1px;
+  background:var(--cream);
+}
+.divider::before{left:0;}
+.divider::after{right:0;}
+
+.guest-btn{
+  width:100%;padding:13px;
+  background:transparent;
+  color:var(--ink);
+  border:1.5px solid var(--cream);
+  border-radius:10px;
+  font-family:'DM Sans',sans-serif;
+  font-size:15px;font-weight:500;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.guest-btn:hover{
+  border-color:var(--ink);
+  background:var(--paper);
+}
+
+.features{
+  display:flex;gap:16px;
+  margin-top:32px;
+  padding-top:28px;
+  border-top:1px solid var(--cream);
+}
+.feat{
+  flex:1;text-align:center;
+}
+.feat-icon{font-size:20px;margin-bottom:6px;}
+.feat-label{
+  font-size:11px;font-weight:500;
+  color:var(--muted);
+  text-transform:uppercase;letter-spacing:0.5px;
+}
+
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+  background:var(--ink);color:white;
+  padding:12px 24px;border-radius:100px;
+  font-size:14px;font-weight:500;
+  transition:transform 0.3s;z-index:999;
+  white-space:nowrap;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="bg-deco">
+  <div class="dot-grid"></div>
+  <div class="ring ring1"></div>
+  <div class="ring ring2"></div>
+  <div class="ring ring3"></div>
+  <div class="ring ring4"></div>
+  <div class="accent-blob"></div>
+  <div class="accent-blob2"></div>
+</div>
+
+<div class="card">
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    <div class="logo-text">Study<span>Buddy</span></div>
+  </div>
+
+  <h1>Welcome back</h1>
+  <p class="subtitle">Your AI-powered study companion</p>
+
+  <div class="tab-row">
+    <button class="tab-btn active" onclick="switchTab('login',this)">Sign In</button>
+    <button class="tab-btn" onclick="switchTab('signup',this)">Create Account</button>
+  </div>
+
+  <div id="login-form">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="you@example.com"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="login-pass" placeholder="••••••••"/>
+    </div>
+    <button class="submit-btn" onclick="handleLogin()">Sign In →</button>
+  </div>
+
+  <div id="signup-form" style="display:none">
+    <div class="field">
+      <label>Full Name</label>
+      <input type="text" id="signup-name" placeholder="Alex Johnson"/>
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="signup-email" placeholder="you@example.com"/>
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="signup-pass" placeholder="Create a password"/>
+    </div>
+    <button class="submit-btn" onclick="handleSignup()">Create Account →</button>
+  </div>
+
+  <div class="divider">or</div>
+  <button class="guest-btn" onclick="continueAsGuest()">Continue as Guest</button>
+
+  <div class="features">
+    <div class="feat"><div class="feat-icon">🧠</div><div class="feat-label">AI Summaries</div></div>
+    <div class="feat"><div class="feat-icon">🃏</div><div class="feat-label">Flashcards</div></div>
+    <div class="feat"><div class="feat-icon">📊</div><div class="feat-label">Progress</div></div>
+    <div class="feat"><div class="feat-icon">🏅</div><div class="feat-label">Achievements</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('login-form').style.display=tab==='login'?'':'none';
+  document.getElementById('signup-form').style.display=tab==='signup'?'':'none';
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function handleLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  if(!email||!pass){showToast('Please fill in all fields');return;}
+  const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+  if(!users[email]||users[email].password!==pass){
+    showToast('Invalid credentials');return;
+  }
+  localStorage.setItem('sb_user',JSON.stringify({...users[email],email}));
+  window.location.href='/dashboard';
+}
+
+function handleSignup(){
+  const name=document.getElementById('signup-name').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const pass=document.getElementById('signup-pass').value;
+  if(!name||!email||!pass){showToast('Please fill in all fields');return;}
+  const users=JSON.parse(localStorage.getItem('sb_users')||'{}');
+  if(users[email]){showToast('Account already exists');return;}
+  const newUser={name,password:pass,joined:Date.now(),stats:{filesUploaded:0,quizzesTaken:0,flashcardsReviewed:0,studyStreak:0,lastStudyDate:null,totalStudyTime:0,quizScores:[],achievements:[],weeklyActivity:{}}};
+  users[email]=newUser;
+  localStorage.setItem('sb_users',JSON.stringify(users));
+  localStorage.setItem('sb_user',JSON.stringify({...newUser,email}));
+  showToast('Account created!');
+  setTimeout(()=>window.location.href='/dashboard',800);
+}
+
+function continueAsGuest(){
+  const guest={name:'Guest',email:'guest@studybuddy.app',joined:Date.now(),stats:{filesUploaded:0,quizzesTaken:0,flashcardsReviewed:0,studyStreak:0,lastStudyDate:null,totalStudyTime:0,quizScores:[],achievements:[],weeklyActivity:{}}};
+  localStorage.setItem('sb_user',JSON.stringify(guest));
+  window.location.href='/dashboard';
+}
+</script>
+</body>
+</html>

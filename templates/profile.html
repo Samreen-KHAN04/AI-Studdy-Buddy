@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy — Profile</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0d14;--paper:#f7f5f0;--cream:#edeae2;
+  --accent:#e85d2f;--accent2:#3d5af1;--gold:#f5b800;
+  --green:#22c55e;--muted:#8b8880;--card:#ffffff;
+  --sidebar:240px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);min-height:100vh;background:var(--ink);color:white;position:fixed;left:0;top:0;bottom:0;display:flex;flex-direction:column;padding:28px 0;z-index:100;}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 24px;margin-bottom:36px;}
+.sb-logo-icon{font-size:24px;}
+.sb-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;}
+.sb-logo-text span{color:var(--accent);}
+.sb-nav{flex:1;}
+.sb-nav a{display:flex;align-items:center;gap:12px;padding:12px 24px;color:rgba(255,255,255,0.55);text-decoration:none;font-size:14px;font-weight:500;transition:all 0.2s;border-left:2px solid transparent;}
+.sb-nav a:hover{color:white;background:rgba(255,255,255,0.06);}
+.sb-nav a.active{color:white;border-left-color:var(--accent);background:rgba(232,93,47,0.12);}
+.sb-nav a .nav-icon{font-size:16px;width:20px;text-align:center;}
+.sb-bottom{padding:0 16px 0;}
+.sb-user{display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.06);cursor:pointer;transition:background 0.2s;}
+.sb-user:hover{background:rgba(255,255,255,0.1);}
+.sb-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;flex-shrink:0;}
+.sb-user-info{flex:1;min-width:0;}
+.sb-user-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sb-user-role{font-size:11px;color:rgba(255,255,255,0.4);}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(247,245,240,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--cream);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;}
+.content{padding:32px;flex:1;}
+
+/* PROFILE HERO */
+.profile-hero{
+  background:var(--ink);border-radius:20px;
+  padding:32px;color:white;margin-bottom:28px;
+  display:flex;align-items:center;gap:24px;
+  position:relative;overflow:hidden;
+}
+.profile-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(232,93,47,0.15);}
+.profile-hero::after{content:'';position:absolute;bottom:-40px;right:80px;width:120px;height:120px;border-radius:50%;background:rgba(61,90,241,0.12);}
+.hero-avatar{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:28px;flex-shrink:0;position:relative;z-index:1;}
+.hero-info{flex:1;position:relative;z-index:1;}
+.hero-name{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;margin-bottom:4px;}
+.hero-email{font-size:14px;color:rgba(255,255,255,0.5);margin-bottom:16px;}
+.hero-stats{display:flex;gap:28px;}
+.hstat{text-align:center;}
+.hstat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:22px;}
+.hstat-label{font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.5px;}
+.streak-pill{display:flex;align-items:center;gap:6px;background:var(--gold);color:var(--ink);padding:8px 16px;border-radius:100px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;position:relative;z-index:1;align-self:flex-start;}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:white;border-radius:14px;padding:6px;margin-bottom:28px;border:1px solid var(--cream);}
+.tab-btn{flex:1;padding:10px 8px;border:none;background:transparent;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;color:var(--muted);border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.tab-btn.active{background:var(--ink);color:white;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* CARDS */
+.card{background:white;border-radius:16px;padding:24px;border:1px solid var(--cream);margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.03);}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* STAT PILLS */
+.stat-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;}
+.stat-pill{flex:1;min-width:100px;background:var(--paper);border-radius:12px;padding:16px;text-align:center;}
+.stat-pill-num{font-family:'Syne',sans-serif;font-weight:800;font-size:24px;color:var(--ink);}
+.stat-pill-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+/* HEATMAP */
+.heatmap-wrap{overflow-x:auto;}
+.heatmap{display:flex;gap:3px;}
+.hm-col{display:flex;flex-direction:column;gap:3px;}
+.hm-cell{width:13px;height:13px;border-radius:3px;background:var(--cream);}
+.hm-cell[data-level="1"]{background:rgba(61,90,241,0.25);}
+.hm-cell[data-level="2"]{background:rgba(61,90,241,0.5);}
+.hm-cell[data-level="3"]{background:rgba(61,90,241,0.75);}
+.hm-cell[data-level="4"]{background:var(--accent2);}
+.hm-months{display:flex;gap:3px;margin-bottom:4px;padding-left:0;}
+.hm-month-label{font-size:10px;color:var(--muted);font-weight:500;}
+
+/* QUIZ CHART */
+.chart-wrap{height:120px;display:flex;align-items:flex-end;gap:6px;padding-top:8px;}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.chart-bar{width:100%;border-radius:6px 6px 0 0;background:var(--accent2);transition:height 0.5s;min-height:4px;}
+.chart-label{font-size:10px;color:var(--muted);font-weight:500;}
+.trend-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:100px;font-size:12px;font-weight:600;margin-top:12px;}
+.trend-up{background:rgba(34,197,94,0.12);color:#16803a;}
+.trend-down{background:rgba(232,93,47,0.12);color:var(--accent);}
+
+/* WEAK AREA DETECTOR */
+.weak-area{
+  background:var(--paper);border-radius:12px;padding:16px;margin-bottom:12px;
+  display:flex;align-items:center;gap:14px;
+}
+.weak-icon{font-size:24px;}
+.weak-info{flex:1;}
+.weak-topic{font-weight:600;font-size:14px;}
+.weak-detail{font-size:12px;color:var(--muted);margin-top:2px;}
+.weak-bar-wrap{width:80px;}
+.weak-bar{height:6px;background:var(--cream);border-radius:3px;overflow:hidden;}
+.weak-bar-fill{height:100%;border-radius:3px;background:var(--accent);}
+
+/* POMODORO */
+.pomodoro{text-align:center;padding:8px 0;}
+.pomo-circle{
+  width:160px;height:160px;border-radius:50%;
+  border:6px solid var(--cream);margin:0 auto 20px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  position:relative;transition:border-color 0.3s;
+}
+.pomo-circle.focus{border-color:var(--accent2);}
+.pomo-circle.break{border-color:var(--green);}
+.pomo-time{font-family:'Syne',sans-serif;font-weight:800;font-size:40px;color:var(--ink);}
+.pomo-phase{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:1px;margin-top:4px;}
+.pomo-dots{display:flex;gap:8px;justify-content:center;margin-bottom:20px;}
+.pomo-dot{width:10px;height:10px;border-radius:50%;background:var(--cream);}
+.pomo-dot.done{background:var(--accent2);}
+.pomo-dot.active{background:var(--accent);}
+.pomo-btns{display:flex;gap:10px;justify-content:center;}
+.pomo-btn{padding:10px 20px;border-radius:10px;border:none;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all 0.2s;}
+.pomo-start{background:var(--ink);color:white;}
+.pomo-reset{background:var(--cream);color:var(--ink);}
+.pomo-skip{background:transparent;border:1.5px solid var(--cream);color:var(--muted);}
+
+/* ACTIVITY FEED */
+.activity-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--cream);}
+.activity-item:last-child{border-bottom:none;}
+.activity-icon{font-size:18px;width:32px;height:32px;background:var(--paper);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.activity-text{flex:1;font-size:13px;}
+.activity-text strong{font-weight:600;}
+.activity-time{font-size:11px;color:var(--muted);}
+
+/* ── SPACED REPETITION ── */
+.sr-stats{display:flex;gap:12px;margin-bottom:24px;}
+.sr-stat{flex:1;border-radius:12px;padding:16px;text-align:center;}
+.sr-stat.due{background:rgba(232,93,47,0.08);color:var(--accent);}
+.sr-stat.learning{background:rgba(245,184,0,0.1);color:#b8870b;}
+.sr-stat.mastered{background:rgba(34,197,94,0.08);color:#16803a;}
+.sr-stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:28px;}
+.sr-stat-label{font-size:12px;font-weight:500;margin-top:2px;}
+
+.sr-card-wrap{min-height:220px;display:flex;align-items:center;justify-content:center;margin-bottom:24px;}
+.sr-flip-card{width:100%;max-width:440px;height:200px;perspective:1000px;cursor:pointer;}
+.sr-inner{position:relative;width:100%;height:100%;transition:transform 0.5s;transform-style:preserve-3d;}
+.sr-flip-card.flipped .sr-inner{transform:rotateY(180deg);}
+.sr-front,.sr-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;padding:24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;}
+.sr-front{background:var(--ink);color:white;}
+.sr-back{background:var(--accent2);color:white;transform:rotateY(180deg);}
+.sr-card-text{font-family:'Syne',sans-serif;font-weight:700;font-size:17px;line-height:1.5;}
+.sr-hint{font-size:12px;opacity:0.45;margin-top:12px;}
+.sr-card-counter{font-size:11px;opacity:0.5;margin-bottom:8px;letter-spacing:1px;}
+.sr-actions{display:flex;gap:12px;justify-content:center;}
+.sr-btn{padding:12px 28px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:all 0.2s;}
+.sr-got-it{background:var(--green);color:white;}
+.sr-didnt{background:var(--accent);color:white;}
+.sr-done-msg{text-align:center;padding:40px;font-family:'Syne',sans-serif;}
+.sr-done-msg h3{font-size:24px;margin-bottom:8px;}
+.sr-done-msg p{color:var(--muted);font-size:14px;}
+
+/* ACHIEVEMENTS */
+.achievements-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;}
+.ach-card{
+  background:white;border:1.5px solid var(--cream);border-radius:16px;
+  padding:20px;text-align:center;transition:all 0.25s;position:relative;overflow:hidden;
+}
+.ach-card.earned{border-color:var(--gold);}
+.ach-card.earned::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(245,184,0,0.06),transparent);}
+.ach-card.locked{opacity:0.4;filter:grayscale(0.5);}
+.ach-icon{font-size:36px;margin-bottom:10px;display:block;}
+.ach-name{font-family:'Syne',sans-serif;font-weight:700;font-size:13px;margin-bottom:4px;}
+.ach-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.ach-badge{
+  position:absolute;top:10px;right:10px;
+  background:var(--gold);color:var(--ink);
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;
+}
+
+/* FILES */
+.file-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--cream);}
+.file-item:last-child{border-bottom:none;}
+.file-item-icon{font-size:24px;width:40px;height:40px;background:var(--paper);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.file-item-info{flex:1;}
+.file-item-name{font-weight:600;font-size:14px;}
+.file-item-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.file-del-btn{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:6px;border-radius:6px;transition:all 0.2s;}
+.file-del-btn:hover{color:var(--accent);background:rgba(232,93,47,0.08);}
+
+/* PROGRESS BARS */
+.progress-item{margin-bottom:20px;}
+.progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.progress-label{font-size:14px;font-weight:500;}
+.progress-val{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;color:var(--accent2);}
+.progress-bar{height:8px;background:var(--cream);border-radius:4px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:4px;transition:width 1s ease;background:var(--accent2);}
+
+/* QUIZ HISTORY */
+.quiz-history-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--cream);}
+.quiz-history-item:last-child{border-bottom:none;}
+.qh-score{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
+.qh-info{flex:1;}
+.qh-file{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.qh-date{font-size:11px;color:var(--muted);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--ink);color:white;padding:12px 24px;border-radius:100px;font-size:14px;font-weight:500;transition:transform 0.3s;z-index:9999;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">📚</div>
+    <div class="sb-logo-text">Study<span>Buddy</span></div>
+  </div>
+  <nav class="sb-nav">
+    <a href="/dashboard"><span class="nav-icon">🏠</span>Dashboard</a>
+    <a href="/profile" class="active"><span class="nav-icon">👤</span>My Profile</a>
+  </nav>
+  <div class="sb-bottom">
+    <div class="sb-user">
+      <div class="sb-avatar" id="sb-avatar">?</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sb-name">Loading...</div>
+        <div class="sb-user-role">My Profile</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title">My Profile</div>
+    <button onclick="logout()" style="background:none;border:1.5px solid var(--cream);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);">Logout</button>
+  </div>
+
+  <div class="content">
+    <!-- HERO -->
+    <div class="profile-hero">
+      <div class="hero-avatar" id="hero-avatar">?</div>
+      <div class="hero-info">
+        <div class="hero-name" id="hero-name">Loading...</div>
+        <div class="hero-email" id="hero-email">—</div>
+        <div class="hero-stats">
+          <div class="hstat"><div class="hstat-num" id="h-files">0</div><div class="hstat-label">PDFs</div></div>
+          <div class="hstat"><div class="hstat-num" id="h-quizzes">0</div><div class="hstat-label">Quizzes</div></div>
+          <div class="hstat"><div class="hstat-num" id="h-cards">0</div><div class="hstat-label">Cards</div></div>
+          <div class="hstat"><div class="hstat-num" id="h-ach">0</div><div class="hstat-label">Badges</div></div>
+        </div>
+      </div>
+      <div class="streak-pill">🔥 <span id="hero-streak">0</span> day streak</div>
+    </div>
+
+    <!-- TAB BAR -->
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('overview',this)">📊 Overview</button>
+      <button class="tab-btn" onclick="switchTab('review',this)">🃏 Review Cards</button>
+      <button class="tab-btn" onclick="switchTab('achievements',this)">🏅 Achievements</button>
+      <button class="tab-btn" onclick="switchTab('files',this)">📂 Files</button>
+      <button class="tab-btn" onclick="switchTab('progress',this)">📈 Progress</button>
+    </div>
+
+    <!-- ── OVERVIEW TAB ── -->
+    <div class="tab-content active" id="tab-overview">
+      <div class="two-col">
+        <div>
+          <!-- HEATMAP -->
+          <div class="card">
+            <div class="card-title">📅 Study Activity</div>
+            <div id="hm-months" class="hm-months"></div>
+            <div class="heatmap-wrap">
+              <div class="heatmap" id="heatmap"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:12px;">
+              <span style="font-size:11px;color:var(--muted);">Less</span>
+              <div class="hm-cell"></div>
+              <div class="hm-cell" data-level="1"></div>
+              <div class="hm-cell" data-level="2"></div>
+              <div class="hm-cell" data-level="3"></div>
+              <div class="hm-cell" data-level="4"></div>
+              <span style="font-size:11px;color:var(--muted);">More</span>
+            </div>
+          </div>
+
+          <!-- QUIZ CHART -->
+          <div class="card">
+            <div class="card-title">📊 Quiz Performance</div>
+            <div class="chart-wrap" id="quiz-chart"></div>
+            <div id="trend-badge"></div>
+          </div>
+        </div>
+
+        <div>
+          <!-- WEAK AREA DETECTOR -->
+          <div class="card">
+            <div class="card-title">🎯 Weak Area Detector</div>
+            <div id="weak-areas-container">
+              <div style="color:var(--muted);font-size:13px;padding:16px 0;">Take quizzes and review flashcards to detect your weak areas.</div>
+            </div>
+          </div>
+
+          <!-- POMODORO -->
+          <div class="card">
+            <div class="card-title">⏱ Pomodoro Timer</div>
+            <div class="pomodoro">
+              <div class="pomo-circle" id="pomo-circle">
+                <div class="pomo-time" id="pomo-time">25:00</div>
+                <div class="pomo-phase" id="pomo-phase">Focus</div>
+              </div>
+              <div class="pomo-dots" id="pomo-dots"></div>
+              <div class="pomo-btns">
+                <button class="pomo-btn pomo-start" id="pomo-start-btn" onclick="pomoToggle()">▶ Start</button>
+                <button class="pomo-btn pomo-skip" onclick="pomoSkip()">⏭ Skip</button>
+                <button class="pomo-btn pomo-reset" onclick="pomoReset()">↺ Reset</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- RECENT ACTIVITY -->
+          <div class="card">
+            <div class="card-title">⚡ Recent Activity</div>
+            <div id="activity-feed"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── REVIEW CARDS TAB (SPACED REPETITION) ── -->
+    <div class="tab-content" id="tab-review">
+      <div class="sr-stats">
+        <div class="sr-stat due"><div class="sr-stat-num" id="sr-due">0</div><div class="sr-stat-label">Due Now</div></div>
+        <div class="sr-stat learning"><div class="sr-stat-num" id="sr-learning">0</div><div class="sr-stat-label">Learning</div></div>
+        <div class="sr-stat mastered"><div class="sr-stat-num" id="sr-mastered">0</div><div class="sr-stat-label">Mastered</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🃏 Spaced Repetition Review</div>
+        <div id="sr-session-container"></div>
+      </div>
+    </div>
+
+    <!-- ── ACHIEVEMENTS TAB ── -->
+    <div class="tab-content" id="tab-achievements">
+      <div class="card">
+        <div class="card-title">🏅 Achievements <span style="font-size:13px;font-weight:400;color:var(--muted)" id="ach-count-label"></span></div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── FILES TAB ── -->
+    <div class="tab-content" id="tab-files">
+      <div class="card">
+        <div class="card-title">📂 Uploaded Files</div>
+        <div id="files-list"></div>
+      </div>
+    </div>
+
+    <!-- ── PROGRESS TAB ── -->
+    <div class="tab-content" id="tab-progress">
+      <div class="two-col">
+        <div class="card">
+          <div class="card-title">📈 Learning Progress</div>
+          <div id="progress-bars"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📋 Quiz Score History</div>
+          <div id="quiz-history"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────────
+const ACHIEVEMENTS_DEF = [
+  {id:'first_upload',icon:'📄',name:'First Upload',desc:'Upload your first PDF',condition:s=>s.filesUploaded>=1},
+  {id:'quiz_taker',icon:'🧠',name:'Quiz Taker',desc:'Complete your first quiz',condition:s=>s.quizzesTaken>=1},
+  {id:'card_creator',icon:'🃏',name:'Card Creator',desc:'Generate flashcards',condition:s=>s.flashcardsReviewed>=1},
+  {id:'bookworm',icon:'📚',name:'Bookworm',desc:'Upload 5 PDFs',condition:s=>s.filesUploaded>=5},
+  {id:'quiz_master',icon:'🏆',name:'Quiz Master',desc:'Complete 10 quizzes',condition:s=>s.quizzesTaken>=10},
+  {id:'perfect_score',icon:'⭐',name:'Perfect Score',desc:'Score 100% on a quiz',condition:s=>(s.quizScores||[]).some(q=>q.score===100)},
+  {id:'high_achiever',icon:'🎯',name:'High Achiever',desc:'Score 90%+ on 3 quizzes',condition:s=>(s.quizScores||[]).filter(q=>q.score>=90).length>=3},
+  {id:'on_fire',icon:'🔥',name:'On Fire',desc:'3-day study streak',condition:s=>(s.studyStreak||0)>=3},
+  {id:'week_warrior',icon:'⚔️',name:'Week Warrior',desc:'7-day study streak',condition:s=>(s.studyStreak||0)>=7},
+  {id:'night_owl',icon:'🦉',name:'Night Owl',desc:'Study after 10 PM',condition:s=>(s.achievements||[]).includes('night_owl')},
+  {id:'early_bird',icon:'🌅',name:'Early Bird',desc:'Study before 7 AM',condition:s=>(s.achievements||[]).includes('early_bird')},
+  {id:'power_user',icon:'⚡',name:'Power User',desc:'Upload 10 PDFs',condition:s=>s.filesUploaded>=10},
+];
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+let user, stats;
+window.addEventListener('DOMContentLoaded', () => {
+  user = JSON.parse(localStorage.getItem('sb_user') || 'null');
+  if (!user) { window.location.href='/'; return; }
+  stats = user.stats || {};
+  renderHero();
+  renderHeatmap();
+  renderQuizChart();
+  renderWeakAreas();
+  renderPomodoro();
+  renderActivity();
+  renderSR();
+  renderAchievements();
+  renderFiles();
+  renderProgress();
+  renderQuizHistory();
+});
+
+function logout() { localStorage.removeItem('sb_user'); window.location.href='/'; }
+function getUser() { return JSON.parse(localStorage.getItem('sb_user')||'null'); }
+function saveUser(u) { localStorage.setItem('sb_user',JSON.stringify(u)); }
+function showToast(msg) { const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800); }
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (tab==='review') renderSR();
+}
+
+// ─── HERO ─────────────────────────────────────────────────────────────────────
+function renderHero() {
+  const initial = user.name.charAt(0).toUpperCase();
+  document.getElementById('sb-avatar').textContent = initial;
+  document.getElementById('sb-name').textContent = user.name;
+  document.getElementById('hero-avatar').textContent = initial;
+  document.getElementById('hero-name').textContent = user.name;
+  document.getElementById('hero-email').textContent = user.email || '';
+  document.getElementById('h-files').textContent = stats.filesUploaded || 0;
+  document.getElementById('h-quizzes').textContent = stats.quizzesTaken || 0;
+  document.getElementById('h-cards').textContent = stats.flashcardsReviewed || 0;
+  const earned = (stats.achievements||[]).length;
+  document.getElementById('h-ach').textContent = earned;
+  document.getElementById('hero-streak').textContent = stats.studyStreak || 0;
+}
+
+// ─── HEATMAP ──────────────────────────────────────────────────────────────────
+function renderHeatmap() {
+  const activity = stats.weeklyActivity || {};
+  const today = new Date();
+  const weeks = 24;
+  // Pad to start of week (Sunday)
+  let start = new Date(today);
+  start.setDate(start.getDate() - (weeks * 7) + 1);
+
+  const heatmap = document.getElementById('heatmap');
+  const monthsEl = document.getElementById('hm-months');
+  heatmap.innerHTML = '';
+  monthsEl.innerHTML = '';
+
+  let monthLabels = [];
+  for (let w = 0; w < weeks; w++) {
+    const col = document.createElement('div');
+    col.className = 'hm-col';
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + w*7 + d);
+      const key = date.toISOString().slice(0,10);
+      const count = activity[key] || 0;
+      const cell = document.createElement('div');
+      cell.className = 'hm-cell';
+      if (count > 0) cell.dataset.level = Math.min(4, count);
+      cell.title = `${key}: ${count} sessions`;
+      col.appendChild(cell);
+      if (d === 0) {
+        const month = date.toLocaleString('default',{month:'short'});
+        if (!monthLabels.includes(month)) {
+          monthLabels.push(month);
+          const span = document.createElement('span');
+          span.className = 'hm-month-label';
+          span.style.minWidth = '42px';
+          span.textContent = month;
+          monthsEl.appendChild(span);
+        }
+      }
+    }
+    heatmap.appendChild(col);
+  }
+}
+
+// ─── QUIZ CHART ───────────────────────────────────────────────────────────────
+function renderQuizChart() {
+  const scores = (stats.quizScores || []).slice(0,10).reverse();
+  const chart = document.getElementById('quiz-chart');
+  chart.innerHTML = '';
+  if (!scores.length) { chart.innerHTML='<span style="color:var(--muted);font-size:13px">No quizzes yet</span>'; return; }
+  const max = 100;
+  scores.forEach((s,i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'chart-bar-wrap';
+    const bar = document.createElement('div');
+    bar.className = 'chart-bar';
+    bar.style.height = Math.max(4, (s.score/max)*100) + '%';
+    bar.style.background = s.score>=80?'var(--green)':s.score>=60?'var(--accent2)':'var(--accent)';
+    bar.title = `${s.score}%`;
+    const label = document.createElement('div');
+    label.className = 'chart-label';
+    label.textContent = s.score+'%';
+    wrap.appendChild(bar);
+    wrap.appendChild(label);
+    chart.appendChild(wrap);
+  });
+  // Trend
+  if (scores.length >= 2) {
+    const first = scores.slice(0, Math.floor(scores.length/2)).reduce((a,b)=>a+b.score,0)/Math.floor(scores.length/2);
+    const last = scores.slice(Math.floor(scores.length/2)).reduce((a,b)=>a+b.score,0)/(scores.length-Math.floor(scores.length/2));
+    const up = last >= first;
+    const badge = document.getElementById('trend-badge');
+    badge.innerHTML = `<span class="trend-badge ${up?'trend-up':'trend-down'}">${up?'↑ Improving':'↓ Needs work'} (avg ${Math.round(last)}%)</span>`;
+  }
+}
+
+// ─── WEAK AREA DETECTOR ───────────────────────────────────────────────────────
+function renderWeakAreas() {
+  const container = document.getElementById('weak-areas-container');
+  const scores = stats.quizScores || [];
+  if (scores.length < 2) return;
+
+  // Group by file and find weak areas
+  const byFile = {};
+  scores.forEach(s => {
+    const key = (s.file || 'Unknown').replace('.pdf','');
+    if (!byFile[key]) byFile[key] = [];
+    byFile[key].push(s.score);
+  });
+  const areas = Object.entries(byFile).map(([topic, sc]) => ({
+    topic,
+    avg: Math.round(sc.reduce((a,b)=>a+b,0)/sc.length),
+    count: sc.length
+  })).sort((a,b)=>a.avg-b.avg);
+
+  container.innerHTML = '';
+  const weak = areas.filter(a=>a.avg<75).slice(0,4);
+  if (!weak.length) {
+    container.innerHTML = '<div style="text-align:center;padding:20px;"><span style="font-size:32px">🎉</span><br><span style="font-size:14px;color:var(--muted)">No weak areas! Great work.</span></div>';
+    return;
+  }
+  weak.forEach(a => {
+    const el = document.createElement('div');
+    el.className = 'weak-area';
+    const icon = a.avg<50?'🔴':a.avg<65?'🟠':'🟡';
+    el.innerHTML = `
+      <div class="weak-icon">${icon}</div>
+      <div class="weak-info">
+        <div class="weak-topic">${a.topic}</div>
+        <div class="weak-detail">Avg score: ${a.avg}% over ${a.count} quiz${a.count>1?'zes':''}</div>
+      </div>
+      <div class="weak-bar-wrap">
+        <div class="weak-bar"><div class="weak-bar-fill" style="width:${a.avg}%"></div></div>
+      </div>`;
+    container.appendChild(el);
+  });
+}
+
+// ─── POMODORO ─────────────────────────────────────────────────────────────────
+let pomoState = { running:false, phase:'focus', elapsed:0, sessions:0, interval:null };
+const POMO_DURATIONS = { focus:25*60, short:5*60, long:15*60 };
+
+function pomoPhaseLabel() { return pomoState.phase==='focus'?'Focus Time':pomoState.phase==='short'?'Short Break':'Long Break'; }
+function pomoDuration() { return POMO_DURATIONS[pomoState.phase]; }
+function formatTime(s) { const m=Math.floor(s/60),sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+
+function renderPomodoro() {
+  const remaining = pomoDuration() - pomoState.elapsed;
+  document.getElementById('pomo-time').textContent = formatTime(remaining);
+  document.getElementById('pomo-phase').textContent = pomoPhaseLabel();
+  const circle = document.getElementById('pomo-circle');
+  circle.className = 'pomo-circle ' + (pomoState.phase==='focus'?'focus':'break');
+  document.getElementById('pomo-start-btn').textContent = pomoState.running ? '⏸ Pause' : '▶ Start';
+  const dots = document.getElementById('pomo-dots');
+  dots.innerHTML = '';
+  for(let i=0;i<4;i++){const d=document.createElement('div');d.className='pomo-dot'+(i<pomoState.sessions?' done':pomoState.sessions===i&&pomoState.phase==='focus'?' active':'');dots.appendChild(d);}
+}
+
+function pomoToggle() {
+  if (pomoState.running) {
+    clearInterval(pomoState.interval); pomoState.running=false;
+  } else {
+    pomoState.running=true;
+    pomoState.interval = setInterval(()=>{
+      pomoState.elapsed++;
+      if (pomoState.elapsed>=pomoDuration()) {
+        clearInterval(pomoState.interval); pomoState.running=false;
+        if (pomoState.phase==='focus') {
+          pomoState.sessions++;
+          pomoState.phase = pomoState.sessions>=4?'long':'short';
+          if (pomoState.sessions>=4) pomoState.sessions=0;
+        } else { pomoState.phase='focus'; }
+        pomoState.elapsed=0;
+        showToast(pomoState.phase==='focus'?'⏰ Break over! Time to focus':'☕ Break time!');
+      }
+      renderPomodoro();
+    },1000);
+  }
+  renderPomodoro();
+}
+function pomoSkip() { clearInterval(pomoState.interval);pomoState.running=false;pomoState.elapsed=pomoDuration()-1;renderPomodoro();setTimeout(pomoToggle,100); }
+function pomoReset() { clearInterval(pomoState.interval);pomoState.running=false;pomoState.elapsed=0;pomoState.phase='focus';pomoState.sessions=0;renderPomodoro(); }
+
+// ─── ACTIVITY FEED ─────────────────────────────────────────────────────────────
+function renderActivity() {
+  const feed = document.getElementById('activity-feed');
+  const items = [];
+  (stats.quizScores||[]).slice(0,3).forEach(q=>items.push({icon:'🧠',text:`Scored <strong>${q.score}%</strong> on ${(q.file||'a quiz').replace('.pdf','')}`,time:q.date}));
+  (stats.files||[]).slice(0,3).forEach(f=>items.push({icon:'📄',text:`Uploaded <strong>${f.name}</strong>`,time:f.date}));
+  items.sort((a,b)=>(b.time||0)-(a.time||0));
+  if (!items.length) { feed.innerHTML='<div style="color:var(--muted);font-size:13px;padding:8px 0">No activity yet. Start studying!</div>'; return; }
+  feed.innerHTML = items.slice(0,6).map(it=>`
+    <div class="activity-item">
+      <div class="activity-icon">${it.icon}</div>
+      <div class="activity-text">${it.text}</div>
+      <div class="activity-time">${it.time?timeAgo(it.time):''}</div>
+    </div>`).join('');
+}
+
+function timeAgo(ts) {
+  const d = Date.now()-ts;
+  if(d<60000) return 'just now';
+  if(d<3600000) return Math.floor(d/60000)+'m ago';
+  if(d<86400000) return Math.floor(d/3600000)+'h ago';
+  return Math.floor(d/86400000)+'d ago';
+}
+
+// ─── SPACED REPETITION ────────────────────────────────────────────────────────
+let srCards = [], srIndex = 0, srFlipped = false;
+
+function renderSR() {
+  srCards = JSON.parse(localStorage.getItem('sb_sr_cards') || '[]');
+  const now = Date.now();
+  const due = srCards.filter(c=>c.nextReview<=now);
+  const learning = srCards.filter(c=>c.status==='learning');
+  const mastered = srCards.filter(c=>c.status==='mastered');
+
+  document.getElementById('sr-due').textContent = due.length;
+  document.getElementById('sr-learning').textContent = learning.length;
+  document.getElementById('sr-mastered').textContent = mastered.length;
+
+  srIndex = 0; srFlipped = false;
+  renderSRCard(due);
+}
+
+function renderSRCard(dueCards) {
+  const container = document.getElementById('sr-session-container');
+  if (!dueCards.length) {
+    const all = JSON.parse(localStorage.getItem('sb_sr_cards')||'[]');
+    if (!all.length) {
+      container.innerHTML = '<div class="sr-done-msg"><h3>📭 No cards yet</h3><p>Generate flashcards from the Dashboard to start reviewing.</p></div>';
+    } else {
+      const next = all.filter(c=>c.nextReview>Date.now()).sort((a,b)=>a.nextReview-b.nextReview)[0];
+      const eta = next ? timeAgo(Date.now()-(next.nextReview-Date.now())) : '';
+      container.innerHTML = `<div class="sr-done-msg"><h3>✅ All caught up!</h3><p>No cards due right now. ${next?`Next review in ${eta}`.replace('ago','').trim():''}</p></div>`;
+    }
+    return;
+  }
+  const card = dueCards[srIndex % dueCards.length];
+  container.innerHTML = `
+    <div style="text-align:center;margin-bottom:12px;font-size:12px;color:var(--muted);font-weight:500">${srIndex+1} of ${dueCards.length} due</div>
+    <div class="sr-card-wrap">
+      <div class="sr-flip-card" id="sr-flip" onclick="flipSRCard()">
+        <div class="sr-inner">
+          <div class="sr-front">
+            <div class="sr-card-counter">QUESTION</div>
+            <div class="sr-card-text">${card.front}</div>
+            <div class="sr-hint">tap to see answer</div>
+          </div>
+          <div class="sr-back">
+            <div class="sr-card-counter">ANSWER</div>
+            <div class="sr-card-text">${card.back}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="sr-actions" id="sr-actions" style="display:none">
+      <button class="sr-btn sr-didnt" onclick="srAnswer(false,'${card.id}')">✗ Didn't Know</button>
+      <button class="sr-btn sr-got-it" onclick="srAnswer(true,'${card.id}')">✓ Got It!</button>
+    </div>`;
+  window._srDue = dueCards;
+}
+
+function flipSRCard() {
+  const flip = document.getElementById('sr-flip');
+  if (!flip) return;
+  flip.classList.toggle('flipped');
+  document.getElementById('sr-actions').style.display = flip.classList.contains('flipped')?'flex':'none';
+}
+
+function srAnswer(correct, cardId) {
+  const all = JSON.parse(localStorage.getItem('sb_sr_cards')||'[]');
+  const card = all.find(c=>c.id===cardId);
+  if (!card) { renderSR(); return; }
+
+  // SM-2 inspired scheduling
+  const now = Date.now();
+  if (!correct) {
+    card.repetitions = 0;
+    card.interval = 1;
+    card.nextReview = now + 60*1000; // 1 minute
+    card.status = 'learning';
+  } else {
+    card.repetitions = (card.repetitions||0)+1;
+    if (card.repetitions===1) { card.interval=10; card.status='learning'; }
+    else if (card.repetitions===2) { card.interval=60*24; card.status='learning'; }
+    else if (card.repetitions===3) { card.interval=60*24*3; card.status='learning'; }
+    else { card.interval=60*24*7; card.status='mastered'; }
+    card.nextReview = now + card.interval*60*1000;
+  }
+  localStorage.setItem('sb_sr_cards',JSON.stringify(all));
+
+  // Move to next
+  const due = window._srDue || [];
+  const remaining = due.filter(c=>c.id!==cardId || !correct);
+  if (!correct) remaining.push(card);
+  srIndex++;
+  renderSRCard(remaining.filter(c=>c.nextReview<=Date.now()+1000));
+}
+
+// ─── ACHIEVEMENTS ─────────────────────────────────────────────────────────────
+function renderAchievements() {
+  const earned = new Set(stats.achievements||[]);
+  // Also compute from current stats
+  ACHIEVEMENTS_DEF.forEach(a=>{if(a.condition(stats))earned.add(a.id);});
+  const grid = document.getElementById('achievements-grid');
+  grid.innerHTML = '';
+  let earnedCount = 0;
+  ACHIEVEMENTS_DEF.forEach(a=>{
+    const isEarned = earned.has(a.id);
+    if(isEarned) earnedCount++;
+    const card = document.createElement('div');
+    card.className = 'ach-card '+(isEarned?'earned':'locked');
+    card.innerHTML = `${isEarned?'<div class="ach-badge">✓</div>':''}<div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div>`;
+    grid.appendChild(card);
+  });
+  document.getElementById('ach-count-label').textContent = `${earnedCount} / ${ACHIEVEMENTS_DEF.length} earned`;
+}
+
+// ─── FILES ────────────────────────────────────────────────────────────────────
+function renderFiles() {
+  const list = document.getElementById('files-list');
+  const files = stats.files || [];
+  if (!files.length) { list.innerHTML='<div style="color:var(--muted);font-size:13px;padding:16px 0">No files uploaded yet. Go to the Dashboard to upload a PDF.</div>'; return; }
+  list.innerHTML = files.map((f,i)=>`
+    <div class="file-item">
+      <div class="file-item-icon">📄</div>
+      <div class="file-item-info">
+        <div class="file-item-name">${f.name}</div>
+        <div class="file-item-meta">${f.pages||'?'} pages • ${(f.words||0).toLocaleString()} words • ${f.date?new Date(f.date).toLocaleDateString():''}</div>
+      </div>
+      <button class="file-del-btn" onclick="deleteFile(${i})" title="Delete">🗑</button>
+    </div>`).join('');
+}
+
+function deleteFile(idx) {
+  const u = getUser(); if(!u) return;
+  u.stats.files = u.stats.files || [];
+  u.stats.files.splice(idx,1);
+  saveUser(u);
+  user = u; stats = u.stats;
+  renderFiles();
+  showToast('File removed');
+}
+
+// ─── PROGRESS ─────────────────────────────────────────────────────────────────
+function renderProgress() {
+  const quizzes = stats.quizzesTaken || 0;
+  const files = stats.filesUploaded || 0;
+  const cards = stats.flashcardsReviewed || 0;
+  const streak = stats.studyStreak || 0;
+  const bars = [
+    {label:'Quizzes Completed', val:quizzes, max:20, color:'var(--accent2)'},
+    {label:'PDFs Uploaded', val:files, max:15, color:'var(--accent)'},
+    {label:'Cards Reviewed', val:cards, max:100, color:'var(--gold)'},
+    {label:'Day Streak', val:streak, max:30, color:'var(--green)'},
+  ];
+  document.getElementById('progress-bars').innerHTML = bars.map(b=>`
+    <div class="progress-item">
+      <div class="progress-header">
+        <div class="progress-label">${b.label}</div>
+        <div class="progress-val">${b.val} / ${b.max}</div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${Math.min(100,(b.val/b.max)*100)}%;background:${b.color}"></div></div>
+    </div>`).join('');
+}
+
+function renderQuizHistory() {
+  const scores = (stats.quizScores || []).slice(0, 20);
+  const el = document.getElementById('quiz-history');
+  if (!scores.length) { el.innerHTML='<div style="color:var(--muted);font-size:13px">No quizzes taken yet.</div>'; return; }
+  el.innerHTML = scores.map(s=>{
+    const color = s.score>=80?'rgba(34,197,94,0.1)':s.score>=60?'rgba(245,184,0,0.1)':'rgba(232,93,47,0.1)';
+    const textColor = s.score>=80?'#16803a':s.score>=60?'#b8870b':'var(--accent)';
+    return `<div class="quiz-history-item">
+      <div class="qh-score" style="background:${color};color:${textColor}">${s.score}%</div>
+      <div class="qh-info">
+        <div class="qh-file">${(s.file||'Quiz').replace('.pdf','')}</div>
+        <div class="qh-date">${s.date?new Date(s.date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
