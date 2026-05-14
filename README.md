@@ -408,8 +408,8 @@ You are free to use, copy, modify, merge, publish, and distribute this software 
 
 ## 👩‍💻 Author
 
-**Samreen Begum**
-B.Tech — Computer Science and Engineering
+**Samreen Begum** , **Asiya Begum**
+B.Tech — Information Technology
 Shadan Women's College of Engineering & Technology
 Affiliated to JNTUH · Hyderabad, Telangana · 2026
 
